@@ -7,7 +7,13 @@ const port = process.env.PORT || 4001;
 const index = require("./routes/index.js");
 
 const app = express();
+app.use(function (req, res, next) {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    next();
+});
 app.use(index);
+
 
 const server = http.createServer(app);
 
@@ -33,7 +39,7 @@ const getApiAndEmit = async socket => {
 
 io.on("connection", socket => {
     console.log("New client connected");
-    
+
     socket.emit('test')
     socket.on('note', (data) => {
         console.log('new note played', data)
