@@ -19,11 +19,17 @@ const server = http.createServer(app);
 
 const io = socketIo(server);
 
+const currentUsers = []
+
 io.on("connection", socket => {
     console.log("New client connected");
-
-    socket.emit('test')
-    socket.on('note', (data) => {
+    socket.on('newUser', name => {
+        console.log(`${name} has joined the jam! With ID: ${socket.id}`)
+        currentUsers.push({userName: name, userId: socket.id})
+        console.log(currentUsers)
+        socket.broadcast.emit('newUser', currentUsers)
+    })
+    socket.on('note', data => {
         console.log('new note played', data)
         socket.broadcast.emit('note', data)
     })
