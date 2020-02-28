@@ -22,7 +22,7 @@ const io = socketIo(server);
 const currentUsers = []
 
 io.on("connection", socket => {
-    console.log("New client connected");
+    console.log("New client connected")
     socket.on('newUser', name => {
         console.log(`${name} has joined the jam! With ID: ${socket.id}`)
         currentUsers.push({userName: name, userId: socket.id})
@@ -34,7 +34,14 @@ io.on("connection", socket => {
         socket.broadcast.emit('note', data)
     })
     socket.on("disconnect", () => {
-        console.log("Client disconnected");
+        console.log("Client disconnected")
+        for (let i = 0; i < currentUsers.length; i++) {
+            if (socket.id === currentUsers[i].userId) {
+                console.log(`${currentUsers[i].userName} has left the jam!`)
+                currentUsers.splice(i, 1)
+            }
+        }
+        console.log(socket.id)
     });
 });
 
