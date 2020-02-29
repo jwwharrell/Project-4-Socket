@@ -21,6 +21,14 @@ const io = socketIo(server);
 
 const currentUsers = []
 
+const getUser = (id) => {
+    for (let i = 0; i < currentUsers.length; i++) {
+        if (id === currentUsers[i].userId) {
+            return currentUsers[i]
+        }
+    }
+}
+
 io.on("connection", socket => {
     console.log("New client connected")
     socket.on('newUser', name => {
@@ -30,18 +38,17 @@ io.on("connection", socket => {
         socket.broadcast.emit('newUser', currentUsers)
     })
     socket.on('note', data => {
-        console.log('new note played', data)
-        socket.broadcast.emit('note', data)
+        let user = getUser(socket.id)
+        console.log(`${user.userName} played:`, data)
+        socket.broadcast.emit('note', data, currentUsers)
     })
     socket.on("disconnect", () => {
-        console.log("Client disconnected")
         for (let i = 0; i < currentUsers.length; i++) {
             if (socket.id === currentUsers[i].userId) {
                 console.log(`${currentUsers[i].userName} has left the jam!`)
                 currentUsers.splice(i, 1)
             }
         }
-        console.log(socket.id)
     });
 });
 
